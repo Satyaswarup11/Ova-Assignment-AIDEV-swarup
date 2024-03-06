@@ -14,7 +14,7 @@ This project showcases a remarkable AI application featuring comprehensive funct
 
 1. Clone Repository:
   ```bash
-  git clone https://github.com/your-username/advanced-ai-application.git to clone the repository locally.
+  git clone https://github.com/Satyaswarup11/Ova-Assignment-AIDEV-swarup.git
   ```
 
 2. Create Virtual Environment (Optional): For project isolation and dependency management, consider creating a virtual environment using tools like venv or conda. <br>
