@@ -10,27 +10,27 @@ This project showcases a remarkable AI application featuring comprehensive funct
 - Function Calling: Automate tasks seamlessly with the capability to schedule calendar events, send emails, and set reminders directly within the application. Added 'play music' functionilaity in the application
 - Human-like Communication: Strives to replicate natural human conversation patterns, creating a more engaging and intuitive user experience.
 
-  ### Installation:
+### Installation:
 
-  1. Clone Repository:
+1. Clone Repository:
   ```bash
   git clone https://github.com/your-username/advanced-ai-application.git to clone the repository locally.
   ```
 
-  2. Create Virtual Environment (Optional): For project isolation and dependency management, consider creating a virtual environment using tools like venv or conda.
-     For windows :
-     ```bash
-     python3 -m venv myenv
-     ```
-     Activate it :
-     ```bash
-     cd myenv
-     Scripts/Activate
-     ```
-  4. Install Dependencies: Navigate to the project directory and run to install required dependencies :
-     ```bash
-      pip install -r requirements.txt 
-     ```
+2. Create Virtual Environment (Optional): For project isolation and dependency management, consider creating a virtual environment using tools like venv or conda. <br>
+   For windows :
+   ```bash
+   python3 -m venv myenv
+   ```
+   Activate it :
+   ```bash
+   cd myenv
+   Scripts/Activate
+   ```
+4. Install Dependencies: Navigate to the project directory and run to install required dependencies :
+   ```bash
+   pip install -r requirements.txt 
+   ```
 
  ### Usage:
 
