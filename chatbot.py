@@ -1,24 +1,25 @@
-# from dotenv import load_dotenv
-# load_dotenv() ## loading all the environment variables
-
 import streamlit as st
-# import os
+import os
+import speech_recognition as sr
+import pyttsx3
 import google.generativeai as genai
 from PIL import Image
-
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-# import google.generativeai as genai
-# from langchain.vectorstores import FAISS
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
+from pydub import AudioSegment
+from pydub.playback import play
 
-GOOGLE_API_KEY = "AIzaSyCUDuZoZlkcg-pksCwsLr3PfT9zIFUwoZU"
 
-genai.configure(api_key=GOOGLE_API_KEY)
+from dotenv import load_dotenv
+
+load_dotenv() ## loading all the environment variables
+os.getenv("GOOGLE_API_KEY")
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 ## function to load Gemini Pro model and get repsonses
 model=genai.GenerativeModel("gemini-pro") 
@@ -26,15 +27,15 @@ model=genai.GenerativeModel("gemini-pro")
 # model = genai.GenerativeModel(model_name="gemini-1.0-pro")
 
 chat = model.start_chat(history=[])
-def get_gemini_response(question):
+
+def get_gemini_response_text(question):
     
-    response=chat.send_message(question,stream=True)
+    response=chat.send_message(question)
     return response
 
 
 def get_gemini_response(input,image,prompt):
     modell = genai.GenerativeModel(model_name="gemini-1.0-pro-vision-latest")
-    # global model
     response = modell.generate_content([input,image[0],prompt])
     return response.text
 
@@ -83,7 +84,7 @@ def get_conversational_chain():
 
     prompt_template = """
     Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+    provided context just say, "answer is not available in the pdf", don't provide the wrong answer\n\n
     Context:\n {context}?\n
     Question: \n{question}\n
 
@@ -107,14 +108,51 @@ def user_input(user_question):
     docs = new_db.similarity_search(user_question)
 
     chain = get_conversational_chain()
-
-    
     response = chain(
         {"input_documents":docs, "question": user_question}
         , return_only_outputs=True)
 
-    print(response)
-    st.write("Reply: ", response["output_text"])
+    st.write("Bot: ", response["output_text"])
+
+
+
+def speak(text):
+    # Initialize text-to-speech engine
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+    # engine.startLoop(False)
+    # if engine._inLoop:
+    #     engine.endLoop()
+    engine = None
+
+
+def recognize_speech():
+    recognizer = sr.Recognizer()
+    mic = sr.Microphone()
+
+    with mic as source:
+        st.write("Speak something...")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
+
+    try:
+        st.write("Recognizing...")
+        user_input = recognizer.recognize_google(audio)
+        st.write(f"You said: {user_input}")
+        return user_input
+    except sr.UnknownValueError:
+        st.write("Sorry, I could not understand.")
+        return None
+    except sr.RequestError as e:
+        st.write(f"Could not request results from Google Speech Recognition service; {e}")
+        return None
+    
+
+def play_music():
+    st.write("Playing music...")
+    musicPath = "C:/Users/SATYASWARUP/Videos/Music/Harry-Styles-Grapejuice-(HipHopKit.com).mp3"
+    os.system(f"start {musicPath}")
 
 
 
@@ -122,7 +160,7 @@ def user_input(user_question):
 
 ##initialize our streamlit app
 
-st.set_page_config(page_title="Chatgpt clone")
+st.set_page_config(page_title="Advanced AI")
 
 st.header("Gemini LLM Application")
 
@@ -130,11 +168,16 @@ st.header("Gemini LLM Application")
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
 
+st.subheader("The Chat History is")
+for role, text in st.session_state['chat_history']:
+    st.write(f"{role}: {text}")
+
 input=st.text_input("Input: ",key="input")
 submit=st.button("Ask anything")
+submit2=st.button("Tell me about the image")  
+submit3=st.button("Get pdf info")  
 
-
-if input:
+if submit3 and input:
     user_input(input)
 
 
@@ -148,23 +191,31 @@ with st.sidebar:
             get_vector_store(text_chunks)
             st.success("Done")
 
+user_input_audio=None
+st.sidebar.title("Audio Input:")
+audio_input_button = st.sidebar.button("Speak")
+if audio_input_button:
+    user_input_audio = recognize_speech()
+
+# Audio output
+# st.sidebar.title("Audio Output:")
+# audio_output_button = st.sidebar.button("Speak Response")
 
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png","pdf"])
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 image=""   
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image.", use_column_width=True)
-
-submit2=st.button("Tell me about the image")  
+ 
 
 input_prompt = """
-               You are an expert in understanding invoices.
-               You will receive input images as invoices &
+               You are an expert in understanding images.
+               You will receive input images as  &
                you will have to answer questions based on the input image
                """
 
-## If ask button is clicked
+## If ask or image button is clicked
 
 if submit2:
     image_data = input_image_setup(uploaded_file)
@@ -173,31 +224,27 @@ if submit2:
     st.write(response)
 
 
-if submit and input:
-    response=get_gemini_response(input)
-    # Add user query and response to session state chat history
-    st.session_state['chat_history'].append(("You", input))
-    st.subheader("The Response is")
-    for chunk in response:
-        st.write(chunk.text)
-        st.session_state['chat_history'].append(("Bot", chunk.text))
-st.subheader("The Chat History is")
+elif (submit and input) or user_input_audio:
+    if user_input_audio:
+        if "play music" in user_input_audio.lower():
+            play_music()
+        else:
+            response=get_gemini_response_text(user_input_audio)
+            st.session_state['chat_history'].append(("You", user_input_audio))
+            response.resolve()
+            print(response.text)
+            speak(response.text)
+            st.session_state['chat_history'].append(("Bot", response.text))
+    else:
+        response=get_gemini_response_text(input)
+        st.session_state['chat_history'].append(("You", input))
+        response.resolve()
+        st.session_state['chat_history'].append(("Bot", response.text))
+
+
     
-for role, text in st.session_state['chat_history']:
-    st.write(f"{role}: {text}")
-    
-
-
 
     
-
-
-
-
-
-
-
-
 
 
 
