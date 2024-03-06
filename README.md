@@ -5,19 +5,19 @@ This is an advanced AI-powered application built using Streamlit that leverages 
 ## Features
 
 1. Chat with Gemini Pro:
-- Utilizes the Gemini Pro language model to provide detailed responses to user queries.
-- Maintains a chat history displayed on the page.
+    - Utilizes the Gemini Pro language model to provide detailed responses to user queries.
+    - Maintains a chat history displayed on the page.
 2. Image Understanding:
-- Allows users to upload an image and receive responses based on the content of the image.
-- Uses the Gemini 1.0 Pro Vision model for image-related inquiries.
+    - Allows users to upload an image and receive responses based on the content of the image.
+    - Uses the Gemini 1.0 Pro Vision model for image-related inquiries.
 3. PDF Information Extraction:
-- Enables users to upload PDF files and extract information from the content.
-- Utilizes natural language processing to understand the text in PDFs.
+    - Enables users to upload PDF files and extract information from the content.
+    - Utilizes natural language processing to understand the text in PDFs.
 4. Speech Recognition and Synthesis:
-- Incorporates speech recognition to understand user input via voice.
-- Provides responses through text-to-speech synthesis.
+    - Incorporates speech recognition to understand user input via voice.
+    - Provides responses through text-to-speech synthesis.
 5. Music Playback:
-- Includes a feature to play music by recognizing the command "play music."
+    - Includes a feature to play music by recognizing the command "play music."
     
 ## Installation:
 
@@ -63,7 +63,7 @@ This is an advanced AI-powered application built using Streamlit that leverages 
    - Click the "Speak" button in the sidebar to provide input via voice.
    - Responses will be displayed in the chat history.
 - Music Playback:
-   -Say "play music" to initiate music playback.
+   - Say "play music" to initiate music playback.
 
 ### Summary of the Mechanisms
 - Interact with the AI: Engage in text-based conversations through the provided input field.
